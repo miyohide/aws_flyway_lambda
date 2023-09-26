@@ -26,9 +26,12 @@ test {
     useJUnitPlatform()
 }
 
-tasks.register('buildZip', Zip) {
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
     into('lib') {
-        from(jar)
-        from(configurations.runtimeClasspath)
+        from configurations.runtimeClasspath
     }
 }
+
+build.dependsOn buildZip
