@@ -26,6 +26,7 @@ test {
     useJUnitPlatform()
 }
 
+// ビルドした結果と依存ラインタイムをまとめてzip化する
 tasks.register('buildZip', Zip) {
     from compileJava
     from processResources
@@ -34,4 +35,5 @@ tasks.register('buildZip', Zip) {
     }
 }
 
+// buildタスクはbuildZipタスクに依存する
 build.dependsOn buildZip
