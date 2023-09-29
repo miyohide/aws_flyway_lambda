@@ -33,6 +33,7 @@ tasks.register('packageFat', Zip) {
     into('lib') {
         from configurations.runtimeClasspath
     }
+    archiveAppendix = 'fat'
 }
 
 // 依存ライブラリだけのパッケージを作る
@@ -40,12 +41,14 @@ tasks.register('packageLibs', Zip) {
     into('java/lib') {
         from configurations.runtimeClasspath
     }
+    archiveAppendix = 'libs'
 }
 
 // 自分で実装したプログラムだけのパッケージを作る
 tasks.register('packageSkinny', Zip) {
     from compileJava
     from processResources
+    archiveAppendix = 'thin'
 }
 
 // buildタスクはpackageSkinnyタスクに依存する
