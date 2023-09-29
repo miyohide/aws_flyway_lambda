@@ -27,7 +27,7 @@ test {
 }
 
 // ビルドした結果と依存ラインタイムをまとめてzip化する
-tasks.register('buildZip', Zip) {
+tasks.register('packageFat', Zip) {
     from compileJava
     from processResources
     into('lib') {
@@ -35,5 +35,18 @@ tasks.register('buildZip', Zip) {
     }
 }
 
-// buildタスクはbuildZipタスクに依存する
-build.dependsOn buildZip
+// 依存ライブラリだけのパッケージを作る
+tasks.register('packageLibs', Zip) {
+    into('java/lib') {
+        from configurations.runtimeClasspath
+    }
+}
+
+// 自分で実装したプログラムだけのパッケージを作る
+tasks.register('packageSkinny', Zip) {
+    from compileJava
+    from processResources
+}
+
+// buildタスクはpackageSkinnyタスクに依存する
+build.dependsOn packageSkinny
