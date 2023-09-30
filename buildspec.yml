@@ -8,7 +8,7 @@ phases:
     commands:
       - ./gradlew clean packageLibs
       - ./gradlew packageSkinny
-  artifacts:
-    files:
-      - '*.zip'
-    base-directory: 'build/distributions'
+artifacts:
+  files:
+    - '*.zip'
+  base-directory: 'build/distributions'
