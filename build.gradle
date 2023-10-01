@@ -15,8 +15,10 @@ repositories {
 }
 
 dependencies {
+    implementation platform('software.amazon.awssdk:bom:2.20.157')
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
     implementation 'com.amazonaws:aws-lambda-java-events:3.11.3'
+    implementation 'software.amazon.awssdk:s3'
     implementation 'org.flywaydb:flyway-core:9.22.2'
     runtimeOnly 'com.amazonaws:aws-lambda-java-log4j2:1.5.1'
     testImplementation platform('org.junit:junit-bom:5.9.1')
