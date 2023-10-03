@@ -27,8 +27,6 @@ public class MyLambda implements RequestHandler<Input, Output> {
   }
 
   public static class Input {
-    public String bucket;
-    public String key;
     public String jdbcURL;
     public String userName;
     public String password;
