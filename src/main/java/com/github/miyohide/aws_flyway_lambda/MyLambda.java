@@ -11,19 +11,20 @@ import org.flywaydb.core.api.output.MigrateResult;
 public class MyLambda implements RequestHandler<Input, Output> {
   @Override
   public Output handleRequest(Input input, Context context) {
-    final Output out = new Output();
-    out.in = input;
-
-    out.operation = migrateContents(input);
-
-    return out;
+    return migrateContents(input);
   }
 
-  public String migrateContents(Input input) {
+  public Output migrateContents(Input input) {
+    Output o = new Output();
+    o.input = input;
     Flyway flyway = Flyway.configure()
             .dataSource(input.jdbcURL, input.userName, input.password).load();
     MigrateResult result = flyway.migrate();
-    return result.getOperation();
+    o.success = result.success;
+    o.operation = result.getOperation();
+    o.initialSchemaVersion = result.initialSchemaVersion;
+    o.targetSchemaVersion = result.targetSchemaVersion;
+    return o;
   }
 
   public static class Input {
@@ -33,7 +34,10 @@ public class MyLambda implements RequestHandler<Input, Output> {
   }
 
   public static class Output {
-    public Input in;
+    public Input input;
     public String operation;
+    public boolean success;
+    public String initialSchemaVersion;
+    public String targetSchemaVersion;
   }
 }
