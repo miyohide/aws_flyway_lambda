@@ -17,14 +17,18 @@ public class MyLambda implements RequestHandler<Input, Output> {
   public Output migrateContents(Input input) {
     Output o = new Output();
     o.input = input;
-    Flyway flyway = Flyway.configure()
-            .dataSource(input.jdbcURL, input.userName, input.password).load();
-    MigrateResult result = flyway.migrate();
+    MigrateResult result = runFlywayMigration(input);
     o.success = result.success;
     o.operation = result.getOperation();
     o.initialSchemaVersion = result.initialSchemaVersion;
     o.targetSchemaVersion = result.targetSchemaVersion;
     return o;
+  }
+
+  public MigrateResult runFlywayMigration(Input input) {
+    Flyway flyway = Flyway.configure()
+            .dataSource(input.jdbcURL, input.userName, input.password).load();
+    return flyway.migrate();
   }
 
   public static class Input {
