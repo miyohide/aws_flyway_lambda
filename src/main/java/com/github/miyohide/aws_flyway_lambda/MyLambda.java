@@ -3,8 +3,6 @@ package com.github.miyohide.aws_flyway_lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
-import com.github.miyohide.aws_flyway_lambda.MyLambda.Input;
-import com.github.miyohide.aws_flyway_lambda.MyLambda.Output;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.output.MigrateResult;
 
@@ -16,32 +14,18 @@ public class MyLambda implements RequestHandler<Input, Output> {
 
   public Output migrateContents(Input input) {
     Output o = new Output();
-    o.input = input;
+    o.setInput(input);
     MigrateResult result = runFlywayMigration(input);
-    o.success = result.success;
-    o.operation = result.getOperation();
-    o.initialSchemaVersion = result.initialSchemaVersion;
-    o.targetSchemaVersion = result.targetSchemaVersion;
+    o.setSuccess(result.success);
+    o.setOperation(result.getOperation());
+    o.setInitialSchemaVersion(result.initialSchemaVersion);
+    o.setTargetSchemaVersion(result.targetSchemaVersion);
     return o;
   }
 
   public MigrateResult runFlywayMigration(Input input) {
     Flyway flyway = Flyway.configure()
-            .dataSource(input.jdbcURL, input.userName, input.password).load();
+            .dataSource(input.getJdbcURL(), input.getUserName(), input.getPassword()).load();
     return flyway.migrate();
-  }
-
-  public static class Input {
-    public String jdbcURL;
-    public String userName;
-    public String password;
-  }
-
-  public static class Output {
-    public Input input;
-    public String operation;
-    public boolean success;
-    public String initialSchemaVersion;
-    public String targetSchemaVersion;
   }
 }

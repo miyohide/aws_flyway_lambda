@@ -14,10 +14,9 @@ class MyLambdaTest {
   @Test
   void handleRequest() {
     MyLambda myLambda = new MyLambda();
-    MyLambda.Input input = new MyLambda.Input();
-    input.lastName = "lastname";
-    input.firstName = "firstname";
-    MyLambda.Output output = myLambda.handleRequest(input, createContext());
-    assertEquals("firstname_lastname", output.fullName);
+
+    Input input = new Input("jdbcURL", "username", "password");
+    Output output = myLambda.handleRequest(input, createContext());
+    assertEquals(false, output.isSuccess());
   }
 }
