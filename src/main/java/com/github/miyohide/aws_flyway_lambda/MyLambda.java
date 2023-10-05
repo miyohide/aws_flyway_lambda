@@ -3,7 +3,6 @@ package com.github.miyohide.aws_flyway_lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
-import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.output.MigrateResult;
 
 public class MyLambda implements RequestHandler<Input, Output> {
@@ -14,8 +13,9 @@ public class MyLambda implements RequestHandler<Input, Output> {
 
   public Output migrateContents(Input input) {
     Output o = new Output();
+    FlywayOperation flywayOperation = new FlywayOperation();
     o.setInput(input);
-    MigrateResult result = runFlywayMigration(input);
+    MigrateResult result = flywayOperation.runMigration(input);
     o.setSuccess(result.success);
     o.setOperation(result.getOperation());
     o.setInitialSchemaVersion(result.initialSchemaVersion);
@@ -23,9 +23,4 @@ public class MyLambda implements RequestHandler<Input, Output> {
     return o;
   }
 
-  public MigrateResult runFlywayMigration(Input input) {
-    Flyway flyway = Flyway.configure()
-            .dataSource(input.getJdbcURL(), input.getUserName(), input.getPassword()).load();
-    return flyway.migrate();
-  }
 }
