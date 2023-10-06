@@ -6,7 +6,12 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.flywaydb.core.api.output.MigrateResult;
 
 public class MyLambda implements RequestHandler<Input, Output> {
-  private FlywayOperation flywayOperation = new FlywayOperation();
+  private FlywayOperation flywayOperation;
+
+  public MyLambda(FlywayOperation flywayOperation) {
+    this.flywayOperation = flywayOperation;
+  }
+
   @Override
   public Output handleRequest(Input input, Context context) {
     return migrateContents(input);
