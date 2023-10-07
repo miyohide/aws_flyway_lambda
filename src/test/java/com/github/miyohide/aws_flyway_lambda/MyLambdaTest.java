@@ -30,16 +30,43 @@ class MyLambdaTest {
     Input input = new Input("jdbcURL", "username", "password");
 
     // Mockとして返す値の設定
+    String dummyOperationName = "migrate";
+    String dummyInitialSchemaVersion = "10";
+    String dummyTargetSchemaVersion = "20";
     doReturn(migrateResult).when(flywayOperation).runMigration(input);
-    doReturn("migrate").when(migrateResult).getOperation();
+    doReturn(dummyOperationName).when(migrateResult).getOperation();
     migrateResult.success = true;
-    migrateResult.initialSchemaVersion = "10";
-    migrateResult.targetSchemaVersion = "20";
+    migrateResult.initialSchemaVersion = dummyInitialSchemaVersion;
+    migrateResult.targetSchemaVersion = dummyTargetSchemaVersion;
 
+    // 実行して値が想定通りであることを確認する
     Output output = myLambda.migrateContents(input);
     assertTrue(output.isSuccess());
-    assertEquals("10", output.getInitialSchemaVersion());
-    assertEquals("20", output.getTargetSchemaVersion());
-    assertEquals("migrate", output.getOperation());
+    assertEquals(dummyInitialSchemaVersion, output.getInitialSchemaVersion());
+    assertEquals(dummyTargetSchemaVersion, output.getTargetSchemaVersion());
+    assertEquals(dummyOperationName, output.getOperation());
+  }
+
+  @Test
+  void handleRequestTest() {
+    Input input = new Input("jdbcURL", "username", "password");
+    Context context = createContext();
+
+    // Mockとして返す値の設定
+    String dummyOperationName = "migrate";
+    String dummyInitialSchemaVersion = "10";
+    String dummyTargetSchemaVersion = "20";
+    doReturn(migrateResult).when(flywayOperation).runMigration(input);
+    doReturn(dummyOperationName).when(migrateResult).getOperation();
+    migrateResult.success = true;
+    migrateResult.initialSchemaVersion = dummyInitialSchemaVersion;
+    migrateResult.targetSchemaVersion = dummyTargetSchemaVersion;
+
+    // 実行して値が想定通りであることを確認する
+    Output output = myLambda.handleRequest(input, context);
+    assertTrue(output.isSuccess());
+    assertEquals(dummyInitialSchemaVersion, output.getInitialSchemaVersion());
+    assertEquals(dummyTargetSchemaVersion, output.getTargetSchemaVersion());
+    assertEquals(dummyOperationName, output.getOperation());
   }
 }
