@@ -8,8 +8,8 @@ import org.flywaydb.core.api.output.MigrateResult;
 public class MyLambda implements RequestHandler<Input, Output> {
   private FlywayOperation flywayOperation;
 
-  public MyLambda(FlywayOperation flywayOperation) {
-    this.flywayOperation = flywayOperation;
+  public MyLambda() {
+    this.flywayOperation = new FlywayOperation();
   }
 
   @Override

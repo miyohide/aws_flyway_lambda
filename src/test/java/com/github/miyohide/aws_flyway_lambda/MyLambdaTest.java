@@ -29,6 +29,7 @@ class MyLambdaTest {
   void migrateContentsTest() {
     Input input = new Input("jdbcURL", "username", "password");
 
+    // Mockとして返す値の設定
     doReturn(migrateResult).when(flywayOperation).runMigration(input);
     doReturn("migrate").when(migrateResult).getOperation();
     migrateResult.success = true;
