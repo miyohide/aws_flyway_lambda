@@ -1,9 +1,9 @@
 package com.github.miyohide.aws_flyway_lambda;
 
 public class Input {
-  private String jdbcURL;
-  private String userName;
-  private String password;
+  public String jdbcURL;
+  public String userName;
+  public String password;
 
   public Input() {
   }
