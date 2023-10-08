@@ -25,4 +25,13 @@ public class Input {
   public String getPassword() {
     return password;
   }
+
+  @Override
+  public String toString() {
+    return "Input{" +
+            "jdbcURL='" + jdbcURL + '\'' +
+            ", userName='" + userName + '\'' +
+            ", password='" + password + '\'' +
+            '}';
+  }
 }

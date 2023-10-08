@@ -14,6 +14,7 @@ public class MyLambda implements RequestHandler<Input, Output> {
 
   @Override
   public Output handleRequest(Input input, Context context) {
+    context.getLogger().log(input.toString());
     return migrateContents(input);
   }
 
