@@ -5,6 +5,9 @@ public class Input {
   private String userName;
   private String password;
 
+  public Input() {
+  }
+
   public Input(String jdbcURL, String userName, String password) {
     this.jdbcURL = jdbcURL;
     this.userName = userName;
