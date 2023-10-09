@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda application that calls the Flyway api
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    # 関数の定義
+    Properties:
+      CodeUri: build/distributions/aws_flyway_lambda-thin-1.0.zip
+      Handler: com.github.miyohide.aws_flyway_lambda.MyLambda::handleRequest
+      Runtime: java17
+      Description: Java function
+      MemorySize: 1024
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+        - AWSLambdaVPCAccessExecutionRole
+      Tracing: Active
+      Layers:
+        - !Ref libs
+    # Layerの定義
+    libs:
+      Type: AWS::Serverless:LayerVersion
+      Properties:
+        LayerName: flyway-java-lib
+        Description: Dependencies for the flyway java app.
+        ContentUri: build/distributions/aws_flyway_lambda-libs-1.0.zip
+        CompatibleRuntimes:
+          - Java17
