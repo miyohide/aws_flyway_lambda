@@ -8,6 +8,9 @@ phases:
     commands:
       - ./gradlew clean packageLibs
       - ./gradlew packageSkinny
+  post_build:
+    commands:
+      - sam package --template-file template.yml --output-template-file package.yml --s3-bucket $S3BUCKET
 artifacts:
   files:
     - '*.zip'
