@@ -21,12 +21,12 @@ Resources:
       Tracing: Active
       Layers:
         - !Ref libs
-    # Layerの定義
-    libs:
-      Type: AWS::Serverless::LayerVersion
-      Properties:
-        LayerName: flyway-java-lib
-        Description: Dependencies for the flyway java app.
-        ContentUri: build/distributions/aws_flyway_lambda-libs-1.0.zip
-        CompatibleRuntimes:
-          - Java17
+  # Layerの定義
+  libs:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: flyway-java-lib
+      Description: Dependencies for the flyway java app.
+      ContentUri: build/distributions/aws_flyway_lambda-libs-1.0.zip
+      CompatibleRuntimes:
+        - Java17
