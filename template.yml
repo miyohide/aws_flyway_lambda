@@ -23,7 +23,7 @@ Resources:
         - !Ref libs
     # Layerの定義
     libs:
-      Type: AWS::Serverless:LayerVersion
+      Type: AWS::Serverless::LayerVersion
       Properties:
         LayerName: flyway-java-lib
         Description: Dependencies for the flyway java app.
