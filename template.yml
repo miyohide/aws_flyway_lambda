@@ -29,4 +29,4 @@ Resources:
       Description: Dependencies for the flyway java app.
       ContentUri: build/distributions/aws_flyway_lambda-libs-1.0.zip
       CompatibleRuntimes:
-        - Java17
+        - java17
