@@ -30,7 +30,7 @@ public class MyLambda implements RequestHandler<Input, Output> {
   @Override
   public Output handleRequest(Input input, Context context) {
     MyLambda myLambda = new MyLambda();
-    myLambda.s3Objects(input.getBucketName());
+    myLambda.copyFromS3bucket(input.getBucketName());
     return migrateContents(input);
   }
 
@@ -45,7 +45,11 @@ public class MyLambda implements RequestHandler<Input, Output> {
     return o;
   }
 
-  private void s3Objects(String bucketName) {
+  /**
+   * 指定されたS3 bucketにあるファイルすべてを/tmpにコピーする
+   * @param bucketName コピー元のS3 bucket名
+   */
+  private void copyFromS3bucket(String bucketName) {
     ListObjectsV2Response listResponse = s3Client.listObjectsV2(builder -> builder.bucket(bucketName));
 
     for (S3Object object : listResponse.contents()) {
