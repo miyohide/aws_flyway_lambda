@@ -3,25 +3,34 @@ package com.github.miyohide.aws_flyway_lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.api.output.MigrateResult;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.model.*;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Paths;
 
 public class MyLambda implements RequestHandler<Input, Output> {
+  private final S3Client s3Client;
+  private final Logger log = LogManager.getLogger(MyLambda.class);
   private FlywayOperation flywayOperation;
 
   public MyLambda() {
+    this.s3Client = S3Client.builder().region(Region.AP_NORTHEAST_1).build();
     this.flywayOperation = new FlywayOperation();
   }
 
   @Override
   public Output handleRequest(Input input, Context context) {
+    MyLambda myLambda = new MyLambda();
+    myLambda.s3Objects(input.getBucketName());
     return migrateContents(input);
   }
 
@@ -36,37 +45,23 @@ public class MyLambda implements RequestHandler<Input, Output> {
     return o;
   }
 
-  public String s3Objects(String bucketName) {
-    S3Client s3 = S3Client.builder().region(Region.AP_NORTHEAST_3).build();
-
-    ListObjectsV2Response listResponse = s3.listObjectsV2(builder -> builder.bucket(bucketName));
-    StringBuilder result = new StringBuilder();
+  private void s3Objects(String bucketName) {
+    ListObjectsV2Response listResponse = s3Client.listObjectsV2(builder -> builder.bucket(bucketName));
 
     for (S3Object object : listResponse.contents()) {
-      result.append("File Name: ").append(object.key()).append(", File Size: ")
-              .append(object.size()).append("\n");
+      saveFileToTmp(object.key(), bucketName);
     }
-    return result.toString();
   }
 
-  public void copyMigrationFiles(String bucketName) {
-    String downloadPath = "/tmp/";
-
-    S3Client s3 = S3Client.builder().region(Region.AP_NORTHEAST_3).build();
-    ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder().bucket(bucketName).build();
-    ListObjectsV2Response listObjectsV2Response = s3.listObjectsV2(listObjectsV2Request);
-
-    for (S3Object s3Object : listObjectsV2Response.contents()) {
-      String objectKey = s3Object.key();
-      String filePath = downloadPath + objectKey;
-
-      GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-              .bucket(bucketName)
-              .key(objectKey)
-              .build();
-
-      s3.getObject(getObjectRequest, Path.of(filePath));
+  private void saveFileToTmp(String key, String bucketName) {
+    GetObjectRequest objectRequest = GetObjectRequest.builder().key(key).bucket(bucketName).build();
+    ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(objectRequest);
+    byte[] data = objectBytes.asByteArray();
+    File myFile = new File(Paths.get("/tmp", key).toString());
+    try (OutputStream os = new FileOutputStream(myFile)) {
+      os.write(data);
+    } catch (IOException ex) {
+      log.warn(ex.getMessage());
     }
-    s3.close();
   }
 }
