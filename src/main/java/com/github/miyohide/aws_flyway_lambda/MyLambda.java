@@ -57,6 +57,11 @@ public class MyLambda implements RequestHandler<Input, Output> {
     }
   }
 
+  /**
+   * 指定したkey(filename)を/tmpにコピーする
+   * @param key コピーするkey(filename)
+   * @param bucketName コピー元のS3 bucket名
+   */
   private void saveFileToTmp(String key, String bucketName) {
     GetObjectRequest objectRequest = GetObjectRequest.builder().key(key).bucket(bucketName).build();
     ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(objectRequest);
