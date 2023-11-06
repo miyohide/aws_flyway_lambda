@@ -16,6 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 public class MyLambda implements RequestHandler<Input, Output> {
   private final S3Client s3Client;
@@ -50,11 +53,22 @@ public class MyLambda implements RequestHandler<Input, Output> {
    * @param bucketName コピー元のS3 bucket名
    */
   private void copyFromS3bucket(String bucketName) {
+    // ウォームスタートでは/tmpが残っているので誤作動を防ぐために削除する
+    deleteTmp();
     ListObjectsV2Response listResponse = s3Client.listObjectsV2(builder -> builder.bucket(bucketName));
 
     for (S3Object object : listResponse.contents()) {
       saveFileToTmp(object.key(), bucketName);
     }
+  }
+
+  /**
+   * /tmp以下のファイルを全て削除する
+   */
+  private void deleteTmp() {
+    Arrays.stream(Objects.requireNonNull(new File("/tmp").listFiles()))
+            .filter(Predicate.not(File::isDirectory))
+            .forEach(File::delete);
   }
 
   /**
