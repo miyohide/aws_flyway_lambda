@@ -58,7 +58,8 @@ public class MyLambda implements RequestHandler<Input, Output> {
     ListObjectsV2Response listResponse = s3Client.listObjectsV2(builder -> builder.bucket(bucketName));
 
     for (S3Object object : listResponse.contents()) {
-      saveFileToTmp(object.key(), bucketName);
+      GetObjectRequest objectRequest = GetObjectRequest.builder().key(object.key()).bucket(bucketName).build();
+      saveFileToTmp(objectRequest);
     }
   }
 
@@ -73,14 +74,12 @@ public class MyLambda implements RequestHandler<Input, Output> {
 
   /**
    * 指定したkey(filename)を/tmpにコピーする
-   * @param key コピーするkey(filename)
-   * @param bucketName コピー元のS3 bucket名
+   * @param objectRequest 対象のGetObjectRequestのインスタンス
    */
-  private void saveFileToTmp(String key, String bucketName) {
-    GetObjectRequest objectRequest = GetObjectRequest.builder().key(key).bucket(bucketName).build();
+  private void saveFileToTmp(GetObjectRequest objectRequest) {
     ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(objectRequest);
     byte[] data = objectBytes.asByteArray();
-    File myFile = new File(Paths.get("/tmp", key).toString());
+    File myFile = new File(Paths.get("/tmp", objectRequest.key()).toString());
     try (OutputStream os = new FileOutputStream(myFile)) {
       os.write(data);
     } catch (IOException ex) {
