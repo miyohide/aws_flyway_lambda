@@ -27,7 +27,7 @@ class MyLambdaTest {
 
   @Test
   void migrateContentsTest() {
-    Input input = new Input("jdbcURL", "username", "password");
+    Input input = new Input("jdbcURL", "username", "password", "bucketName");
 
     // Mockとして返す値の設定
     String dummyOperationName = "migrate";
@@ -49,7 +49,7 @@ class MyLambdaTest {
 
   @Test
   void handleRequestTest() {
-    Input input = new Input("jdbcURL", "username", "password");
+    Input input = new Input("jdbcURL", "username", "password", "bucketName");
     Context context = createContext();
 
     // Mockとして返す値の設定
