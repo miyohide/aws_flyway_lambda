@@ -6,8 +6,7 @@ public class Input {
   private String password;
   private String bucketName;
 
-  public Input() {
-  }
+  public Input() {}
 
   public Input(String jdbcURL, String userName, String password, String bucketName) {
     this.jdbcURL = jdbcURL;
@@ -50,11 +49,19 @@ public class Input {
 
   @Override
   public String toString() {
-    return "Input{" +
-            "jdbcURL='" + jdbcURL + '\'' +
-            ", userName='" + userName + '\'' +
-            ", password='" + password + '\'' +
-            ", bucketName='" + bucketName + '\'' +
-            '}';
+    return "Input{"
+        + "jdbcURL='"
+        + jdbcURL
+        + '\''
+        + ", userName='"
+        + userName
+        + '\''
+        + ", password='"
+        + password
+        + '\''
+        + ", bucketName='"
+        + bucketName
+        + '\''
+        + '}';
   }
 }

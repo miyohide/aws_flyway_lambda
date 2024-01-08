@@ -1,5 +1,8 @@
 package com.github.miyohide.aws_flyway_lambda;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import org.flywaydb.core.api.output.MigrateResult;
 import org.junit.jupiter.api.Test;
@@ -8,18 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class MyLambdaTest {
-  @Mock
-  private FlywayOperation flywayOperation;
-  @Mock
-  private MigrateResult migrateResult;
+  @Mock private FlywayOperation flywayOperation;
+  @Mock private MigrateResult migrateResult;
 
-  @InjectMocks
-  private MyLambda myLambda;
+  @InjectMocks private MyLambda myLambda;
 
   private Context createContext() {
     return new TestContext();
