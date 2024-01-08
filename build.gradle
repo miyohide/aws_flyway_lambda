@@ -64,3 +64,9 @@ tasks.register('packageSkinny', Zip) {
 
 // buildタスクはpackageSkinnyタスクに依存する
 build.dependsOn packageSkinny
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
+}
