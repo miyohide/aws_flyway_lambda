@@ -16,14 +16,13 @@ repositories {
 }
 
 dependencies {
-    implementation platform('software.amazon.awssdk:bom:2.22.0')
+    implementation platform('software.amazon.awssdk:bom:2.22.12')
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
     implementation 'com.amazonaws:aws-lambda-java-events:3.11.4'
     implementation 'software.amazon.awssdk:s3'
     implementation 'org.flywaydb:flyway-core:9.22.2'
     runtimeOnly 'com.amazonaws:aws-lambda-java-log4j2:1.6.0'
-    runtimeOnly 'org.postgresql:postgresql:42.6.0'
-    runtimeOnly 'com.mysql:mysql-connector-j:8.1.0'
+    runtimeOnly 'org.postgresql:postgresql:42.7.1'
     aspect 'software.amazon.lambda:powertools-logging:1.18.0'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
