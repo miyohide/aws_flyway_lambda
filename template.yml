@@ -2,6 +2,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: An AWS Lambda application that calls the Flyway api
 Resources:
+  bucket01:
+    Type: AWS::S3::Bucket
+    # アプリ用のS3 Bucket
+    Properties:
+      BucketName: "miyohideawsflywaybucket01"
   function:
     Type: AWS::Serverless::Function
     # 関数の定義
@@ -18,6 +23,7 @@ Resources:
         - AWSLambda_ReadOnlyAccess
         - AWSXrayWriteOnlyAccess
         - AWSLambdaVPCAccessExecutionRole
+        - AmazonS3ReadOnlyAccess
       Tracing: Active
       Layers:
         - !Ref libs
