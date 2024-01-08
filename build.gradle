@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'io.freefair.aspectj.post-compile-weaving' version '8.1.0'
+    // Google Java Format
+    id 'com.diffplug.spotless' version '6.23.3'
 }
 
 group = 'com.github.miyohide'
