@@ -40,11 +40,12 @@ public class MyLambda implements RequestHandler<Input, Output> {
   public Output migrateContents(Input input) {
     Output o = new Output();
     o.setInput(input);
-    MigrateResult result = flywayOperation.runMigration(input);
-    o.setSuccess(result.success);
-    o.setOperation(result.getOperation());
-    o.setInitialSchemaVersion(result.initialSchemaVersion);
-    o.setTargetSchemaVersion(result.targetSchemaVersion);
+    flywayOperation.runQuery(input);
+//    MigrateResult result = flywayOperation.runMigration(input);
+//    o.setSuccess(result.success);
+//    o.setOperation(result.getOperation());
+//    o.setInitialSchemaVersion(result.initialSchemaVersion);
+//    o.setTargetSchemaVersion(result.targetSchemaVersion);
     return o;
   }
 
