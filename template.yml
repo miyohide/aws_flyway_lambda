@@ -2,6 +2,54 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: An AWS Lambda application that calls the Flyway api
 Resources:
+  vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CiderBlock: 10.0.0.0/16
+      InstanceTenancy: default
+      EnableDnsSupport: true
+      EnableDnsHostnames: false
+      Tags:
+        - Key: Name
+          Value: AWS-Flayway-Lambda-VPC
+  publicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/24
+      VpcId: !Ref vpc
+      AvailabilityZone: !Select [0, !GetAZs]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: AWS-Flayway-Lambda-public-subnet1
+  publicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      VpcId: !Ref vpc
+      AvailabilityZone: !Select [1, !GetAZs]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: AWS-Flayway-Lambda-public-subnet2
+  privateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.2.0/24
+      VpcId: !Ref vpc
+      AvailabilityZone: !Select [0, !GetAZs]
+      Tags:
+        - Key: Name
+          Value: AWS-Flayway-Lambda-private-subnet1
+  privateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.3.0/24
+      VpcId: !Ref vpc
+      AvailabilityZone: !Select [1, !GetAZs]
+      Tags:
+        - Key: Name
+          Value: AWS-Flayway-Lambda-private-subnet2
   bucket01:
     Type: AWS::S3::Bucket
     # アプリ用のS3 Bucket
