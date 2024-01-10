@@ -50,6 +50,19 @@ Resources:
       Tags:
         - Key: Name
           Value: AWS-Flayway-Lambda-private-subnet2
+  # Internet Gateway
+  vpcigw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: AWS-Flayway-Lambda-igw
+  # attach Internet Gateway to VPC
+  vpcigwattach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref vpcigw
+      VpcId: !Ref vpc
   bucket01:
     Type: AWS::S3::Bucket
     # アプリ用のS3 Bucket
