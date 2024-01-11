@@ -63,6 +63,15 @@ Resources:
     Properties:
       InternetGatewayId: !Ref vpcigw
       VpcId: !Ref vpc
+  # route table
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: AWS-Flayway-Lambda-public-route-table
+
   bucket01:
     Type: AWS::S3::Bucket
     # アプリ用のS3 Bucket
