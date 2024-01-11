@@ -4,6 +4,8 @@ plugins {
     id 'io.freefair.aspectj.post-compile-weaving' version '8.1.0'
     // Google Java Format
     id 'com.diffplug.spotless' version '6.23.3'
+    // print log on the console while running tests
+    id 'com.adarshr.test-logger' version '4.0.0'
 }
 
 group = 'com.github.miyohide'
