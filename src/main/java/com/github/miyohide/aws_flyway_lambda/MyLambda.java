@@ -20,7 +20,7 @@ import software.amazon.awssdk.services.s3.model.*;
 public class MyLambda implements RequestHandler<Input, Output> {
   private final S3Client s3Client;
   private final Logger log = LogManager.getLogger(MyLambda.class);
-  private FlywayOperation flywayOperation;
+  private final FlywayOperation flywayOperation;
 
   public MyLambda() {
     this.s3Client = S3Client.builder().region(Region.AP_NORTHEAST_1).build();
