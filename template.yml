@@ -64,7 +64,7 @@ Resources:
       InternetGatewayId: !Ref vpcigw
       VpcId: !Ref vpc
   # route table
-  PublicRouteTable:
+  publicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref vpc
@@ -72,11 +72,11 @@ Resources:
         - Key: Name
           Value: AWS-Flayway-Lambda-public-route-table
   # routing定義
-  PublicRoute:
+  publicRoute:
     Type: AWS::EC2::Route
     DependsOn: vpcigw
     Properties:
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref publicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref vpcigw
   # route tableのアサイン
@@ -84,13 +84,13 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref publicSubnet1
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref publicRouteTable
 
   publicSubnet2Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref publicSubnet2
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref publicRouteTable
 
   bucket01:
     Type: AWS::S3::Bucket
