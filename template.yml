@@ -71,6 +71,26 @@ Resources:
       Tags:
         - Key: Name
           Value: AWS-Flayway-Lambda-public-route-table
+  # routing定義
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: vpcigw
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref vpcigw
+  # route tableのアサイン
+  publicSubnet1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref publicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  publicSubnet2Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref publicSubnet2
+      RouteTableId: !Ref PublicRouteTable
 
   bucket01:
     Type: AWS::S3::Bucket
