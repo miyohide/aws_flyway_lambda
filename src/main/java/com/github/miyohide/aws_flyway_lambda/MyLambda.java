@@ -10,8 +10,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Predicate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -19,7 +20,7 @@ import software.amazon.awssdk.services.s3.model.*;
 
 public class MyLambda implements RequestHandler<Input, Output> {
   private final S3Client s3Client;
-  private final Logger log = LogManager.getLogger(MyLambda.class);
+  private final Logger log = LoggerFactory.getLogger(MyLambda.class);
   private final FlywayOperation flywayOperation;
 
   public MyLambda() {
