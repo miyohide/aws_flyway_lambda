@@ -20,11 +20,9 @@ import software.amazon.awssdk.services.s3.model.*;
 public class MyLambda implements RequestHandler<Input, Output> {
   private final S3Client s3Client;
   private final Logger log = LoggerFactory.getLogger(MyLambda.class);
-  private final FlywayOperation flywayOperation;
 
   public MyLambda() {
     this.s3Client = S3Client.builder().region(Region.AP_NORTHEAST_1).build();
-    this.flywayOperation = new FlywayOperation();
   }
 
   @Override
@@ -37,12 +35,6 @@ public class MyLambda implements RequestHandler<Input, Output> {
   public Output migrateContents(Input input) {
     Output o = new Output();
     o.setInput(input);
-    flywayOperation.runQuery(input);
-    //    MigrateResult result = flywayOperation.runMigration(input);
-    //    o.setSuccess(result.success);
-    //    o.setOperation(result.getOperation());
-    //    o.setInitialSchemaVersion(result.initialSchemaVersion);
-    //    o.setTargetSchemaVersion(result.targetSchemaVersion);
     return o;
   }
 
