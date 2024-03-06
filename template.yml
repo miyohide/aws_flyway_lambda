@@ -12,91 +12,69 @@ Resources:
       Tags:
         - Key: Name
           Value: AWS-Flayway-Lambda-VPC
-  publicSubnet1:
+  private1:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 10.0.0.0/24
       VpcId: !Ref vpc
       AvailabilityZone: !Select [0, !GetAZs]
-      MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: AWS-Flayway-Lambda-public-subnet1
-  publicSubnet2:
+          Value: AWS-Flayway-Lambda-private1
+  private2:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 10.0.1.0/24
       VpcId: !Ref vpc
       AvailabilityZone: !Select [1, !GetAZs]
-      MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: AWS-Flayway-Lambda-public-subnet2
-  privateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: 10.0.2.0/24
-      VpcId: !Ref vpc
-      AvailabilityZone: !Select [0, !GetAZs]
-      Tags:
-        - Key: Name
-          Value: AWS-Flayway-Lambda-private-subnet1
-  privateSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: 10.0.3.0/24
-      VpcId: !Ref vpc
-      AvailabilityZone: !Select [1, !GetAZs]
-      Tags:
-        - Key: Name
-          Value: AWS-Flayway-Lambda-private-subnet2
-  # Internet Gateway
-  vpcigw:
-    Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: AWS-Flayway-Lambda-igw
-  # attach Internet Gateway to VPC
-  vpcigwattach:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      InternetGatewayId: !Ref vpcigw
-      VpcId: !Ref vpc
+          Value: AWS-Flayway-Lambda-private2
   # route table
-  publicRouteTable:
+  routeTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref vpc
       Tags:
         - Key: Name
-          Value: AWS-Flayway-Lambda-public-route-table
-  # routing定義
-  publicRoute:
-    Type: AWS::EC2::Route
-    DependsOn: vpcigw
-    Properties:
-      RouteTableId: !Ref publicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref vpcigw
+          Value: AWS-Flayway-Lambda-route-table
   # route tableのアサイン
-  publicSubnet1Association:
+  subnet1Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref publicSubnet1
-      RouteTableId: !Ref publicRouteTable
-
-  publicSubnet2Association:
+      SubnetId: !Ref private1
+      RouteTableId: !Ref routeTable
+  subnet2Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref publicSubnet2
-      RouteTableId: !Ref publicRouteTable
+      SubnetId: !Ref private2
+      RouteTableId: !Ref routeTable
+  # VPC LambdaからS3にアクセスするためのVPCエンドポイント
+  vpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref vpc
+      VpcEndpointType: Gateway
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      RouteTables:
+        - !Ref routeTable
+  # Lambdaが使用するセキュリティグループ
+  securityGroupForLambda:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: security-group-for-lambda
+      GroupDescription: For Lambda
+      VpcId: !Ref vpc
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
 
   bucket01:
     Type: AWS::S3::Bucket
     # アプリ用のS3 Bucket
     Properties:
       BucketName: "miyohideawsflywaybucket01"
+
   function:
     Type: AWS::Serverless::Function
     # 関数の定義
@@ -114,9 +92,15 @@ Resources:
         - AWSXrayWriteOnlyAccess
         - AWSLambdaVPCAccessExecutionRole
         - AmazonS3ReadOnlyAccess
-      Tracing: Active
       Layers:
         - !Ref libs
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt securityGroupForLambda.GroupId
+        SubnetIds:
+          - !Ref private1
+          - !Ref private2
+
   # Layerの定義
   libs:
     Type: AWS::Serverless::LayerVersion
