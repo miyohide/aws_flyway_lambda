@@ -1,81 +1,25 @@
 package com.github.miyohide.aws_flyway_lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.function.Predicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.core.ResponseBytes;
+import com.amazonaws.services.lambda.runtime.logging.LogLevel;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
 
-public class MyLambda implements RequestHandler<Input, Output> {
-  private final S3Client s3Client;
-  private final Logger log = LoggerFactory.getLogger(MyLambda.class);
-
-  public MyLambda() {
-    this.s3Client = S3Client.builder().region(Region.AP_NORTHEAST_1).build();
-  }
+public class MyLambda implements RequestHandler<Input, String> {
+  private final S3Client s3Client = S3Client.builder().region(Region.AP_NORTHEAST_1).build();
 
   @Override
-  public Output handleRequest(Input input, Context context) {
-    MyLambda myLambda = new MyLambda();
-    myLambda.copyFromS3bucket(input.getBucketName());
-    return migrateContents(input);
-  }
-
-  public Output migrateContents(Input input) {
-    Output o = new Output();
-    o.setInput(input);
-    return o;
-  }
-
-  /**
-   * 指定されたS3 bucketにあるファイルすべてを/tmpにコピーする
-   *
-   * @param bucketName コピー元のS3 bucket名
-   */
-  private void copyFromS3bucket(String bucketName) {
-    // ウォームスタートでは/tmpが残っているので誤作動を防ぐために削除する
-    deleteTmp();
-    ListObjectsV2Response listResponse =
-        s3Client.listObjectsV2(builder -> builder.bucket(bucketName));
-
-    for (S3Object object : listResponse.contents()) {
-      GetObjectRequest objectRequest =
-          GetObjectRequest.builder().key(object.key()).bucket(bucketName).build();
-      saveFileToTmp(objectRequest);
-    }
-  }
-
-  /** /tmp以下のファイルを全て削除する */
-  private void deleteTmp() {
-    Arrays.stream(Objects.requireNonNull(new File("/tmp").listFiles()))
-        .filter(Predicate.not(File::isDirectory))
-        .forEach(File::delete);
-  }
-
-  /**
-   * 指定したkey(filename)を/tmpにコピーする
-   *
-   * @param objectRequest 対象のGetObjectRequestのインスタンス
-   */
-  private void saveFileToTmp(GetObjectRequest objectRequest) {
-    ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(objectRequest);
-    byte[] data = objectBytes.asByteArray();
-    File myFile = new File(Paths.get("/tmp", objectRequest.key()).toString());
-    try (OutputStream os = new FileOutputStream(myFile)) {
-      os.write(data);
-    } catch (IOException ex) {
-      log.warn(ex.getMessage());
-    }
+  public String handleRequest(Input input, Context context) {
+    LambdaLogger logger = context.getLogger();
+    logger.log("Handler Start", LogLevel.INFO);
+    S3Utils s3Utils = new S3Utils(s3Client);
+    logger.log("S3Utils#copyFromS3bucket() start", LogLevel.DEBUG);
+    s3Utils.copyFromS3bucket(input.getBucketName());
+    // TODO /tmp 以下のファイル一覧を出力させたい
+    logger.log("S3Utils#deleteTmp() start", LogLevel.DEBUG);
+    s3Utils.deleteTmp();
+    return "success";
   }
 }
