@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     // Google Java Format
-    id 'com.diffplug.spotless' version '6.23.3'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 group = 'com.github.miyohide'
