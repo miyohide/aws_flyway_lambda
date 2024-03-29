@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 public class MyLambda implements RequestHandler<Input, String> {
   private final S3Client s3Client = S3Client.builder().region(Region.AP_NORTHEAST_1).build();
@@ -25,18 +26,45 @@ public class MyLambda implements RequestHandler<Input, String> {
     logger.log("S3Utils#copyFromS3bucket() start", LogLevel.DEBUG);
     s3Utils.copyFromS3bucket(input.getBucketName());
 
-    // JDBCを使ってRDS（PostgreSQL）に接続する
-    logger.log("Connect to the database", LogLevel.DEBUG);
+    // JDBCを使ってRDS（PostgreSQL）にpeopleテーブルを作成する
+    logger.log("Connect to the database", LogLevel.INFO);
     try (
       Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
       Statement st = c.createStatement();
     ) {
-      logger.log(c.getCatalog(), LogLevel.INFO);
+      logger.log("Create people table", LogLevel.INFO);
+      c.setAutoCommit(false);
       st.execute("CREATE TABLE IF NOT EXISTS people (id BIGSERIAL PRIMARY KEY, name VARCHAR(100))");
-      st.execute("INSERT INTO people (name) VALUES ('testpeople01')");
-      st.execute("INSERT INTO people (name) VALUES ('testpeople02')");
+      c.commit();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return "fail";
+    }
 
-      ResultSet rs = st.executeQuery("SELECT id, name FROM people");
+    // JDBCを使ってRDS（PostgreSQL）のpeopleテーブルにデータを挿入する
+    try (
+      Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
+      PreparedStatement st = c.prepareStatement("INSERT INTO people (name) VALUES (?)");
+    ) {
+      logger.log("insert data to people table", LogLevel.INFO);
+      c.setAutoCommit(false);
+      st.setString(1, "testpeople01");
+      st.execute();
+      st.setString(1, "testpeople02");
+      st.execute();
+      c.commit();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return "fail";
+    }
+
+    // JDBCを使ってRDS（PostgreSQL）にあるpeopleテーブルのデータをselectする
+    try (
+      Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
+      PreparedStatement st = c.prepareStatement("SELECT id, name FROM people");
+    ) {
+      logger.log("select people table", LogLevel.INFO);
+      ResultSet rs = st.executeQuery();
       while (rs.next()) {
         long id = rs.getLong("id");
         String name = rs.getString("name");
@@ -45,6 +73,7 @@ public class MyLambda implements RequestHandler<Input, String> {
       rs.close();
     } catch (SQLException e) {
       e.printStackTrace();
+      return "fail";
     }
     return "success";
   }
