@@ -56,7 +56,7 @@ Resources:
       VpcId: !Ref vpc
       VpcEndpointType: Gateway
       ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
-      RouteTables:
+      RouteTableIds:
         - !Ref routeTable
   # Lambdaが使用するセキュリティグループ
   securityGroupForLambda:
