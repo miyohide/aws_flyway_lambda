@@ -17,7 +17,7 @@ Resources:
     Properties:
       CidrBlock: 10.0.0.0/24
       VpcId: !Ref vpc
-      AvailabilityZone: !Select [0, !GetAZs]
+      AvailabilityZone: !Select [0, !GetAZs '']
       Tags:
         - Key: Name
           Value: AWS-Flayway-Lambda-private1
@@ -26,7 +26,7 @@ Resources:
     Properties:
       CidrBlock: 10.0.1.0/24
       VpcId: !Ref vpc
-      AvailabilityZone: !Select [1, !GetAZs]
+      AvailabilityZone: !Select [1, !GetAZs '']
       Tags:
         - Key: Name
           Value: AWS-Flayway-Lambda-private2
