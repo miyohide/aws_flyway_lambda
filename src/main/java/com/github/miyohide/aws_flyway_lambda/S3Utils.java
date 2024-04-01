@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
@@ -52,13 +53,20 @@ public class S3Utils {
   }
 
   /**
-   * 指定したkey(filename)を/tmpにコピーする
+   * 指定したkey(filename)を/tmp/sqlにコピーする
    *
    * @param objectRequest 対象のGetObjectRequestのインスタンス
+   * @throws IOException
    */
   public void saveFileToTmp(GetObjectRequest objectRequest) {
     ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(objectRequest);
     byte[] data = objectBytes.asByteArray();
+    // /tmp/sqlというディレクトリを作成する
+    try {
+      Files.createDirectory(Paths.get("/tmp", "sql"));
+    } catch (Exception ex) {
+      log.warn(ex.getMessage());
+    }
     File myFile = new File(Paths.get("/tmp", objectRequest.key()).toString());
     try (OutputStream os = new FileOutputStream(myFile)) {
       os.write(data);
