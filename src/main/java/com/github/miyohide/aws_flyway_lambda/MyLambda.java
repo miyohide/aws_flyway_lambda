@@ -12,6 +12,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.flywaydb.core.Flyway;
+
 import java.sql.PreparedStatement;
 
 public class MyLambda implements RequestHandler<Input, String> {
@@ -26,20 +29,28 @@ public class MyLambda implements RequestHandler<Input, String> {
     logger.log("S3Utils#copyFromS3bucket() start", LogLevel.DEBUG);
     s3Utils.copyFromS3bucket(input.getBucketName());
 
+    // Flywayを使ってDatabase Migrationを実行する
+    logger.log("Flyway#migrate() start", LogLevel.INFO);
+    Flyway flyway = Flyway.configure()
+    .dataSource(input.getJdbcURL(), input.getUserName(), input.getPassword())
+    .locations("/tmp/sql")
+    .load();
+
+    flyway.migrate();
     // JDBCを使ってRDS（PostgreSQL）にpeopleテーブルを作成する
-    logger.log("Connect to the database", LogLevel.INFO);
-    try (
-      Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
-      Statement st = c.createStatement();
-    ) {
-      logger.log("Create people table", LogLevel.INFO);
-      c.setAutoCommit(false);
-      st.execute("CREATE TABLE IF NOT EXISTS people (id BIGSERIAL PRIMARY KEY, name VARCHAR(100))");
-      c.commit();
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return "fail";
-    }
+    // logger.log("Connect to the database", LogLevel.INFO);
+    // try (
+    //   Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
+    //   Statement st = c.createStatement();
+    // ) {
+    //   logger.log("Create people table", LogLevel.INFO);
+    //   c.setAutoCommit(false);
+    //   st.execute("CREATE TABLE IF NOT EXISTS people (id BIGSERIAL PRIMARY KEY, name VARCHAR(100))");
+    //   c.commit();
+    // } catch (SQLException e) {
+    //   e.printStackTrace();
+    //   return "fail";
+    // }
 
     // JDBCを使ってRDS（PostgreSQL）のpeopleテーブルにデータを挿入する
     try (
