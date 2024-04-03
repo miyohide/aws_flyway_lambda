@@ -54,14 +54,14 @@ public class MyLambda implements RequestHandler<Input, String> {
     // JDBCを使ってRDS（PostgreSQL）のpeopleテーブルにデータを挿入する
     try (
       Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
-      PreparedStatement st = c.prepareStatement("INSERT INTO people (name) VALUES (?)");
+      PreparedStatement insertSt = c.prepareStatement("INSERT INTO people (name) VALUES (?)");
     ) {
       logger.log("insert data to people table", LogLevel.INFO);
       c.setAutoCommit(false);
-      st.setString(1, "testpeople01");
-      st.execute();
-      st.setString(1, "testpeople02");
-      st.execute();
+      insertSt.setString(1, "testpeople01");
+      insertSt.execute();
+      insertSt.setString(1, "testpeople02");
+      insertSt.execute();
       c.commit();
     } catch (SQLException e) {
       e.printStackTrace();
