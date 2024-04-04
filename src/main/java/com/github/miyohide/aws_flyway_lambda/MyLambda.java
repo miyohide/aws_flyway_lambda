@@ -51,10 +51,11 @@ public class MyLambda implements RequestHandler<Input, String> {
     //   return "fail";
     // }
 
-    // JDBCを使ってRDS（PostgreSQL）のpeopleテーブルにデータを挿入する
+    // JDBCを使ってRDS（PostgreSQL）のpeopleテーブルにデータを挿入し、結果を参照する
     try (
       Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
       PreparedStatement insertSt = c.prepareStatement("INSERT INTO people (name) VALUES (?)");
+      PreparedStatement st = c.prepareStatement("SELECT id, name FROM people");
     ) {
       logger.log("insert data to people table", LogLevel.INFO);
       c.setAutoCommit(false);
@@ -63,16 +64,7 @@ public class MyLambda implements RequestHandler<Input, String> {
       insertSt.setString(1, "testpeople02");
       insertSt.execute();
       c.commit();
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return "fail";
-    }
 
-    // JDBCを使ってRDS（PostgreSQL）にあるpeopleテーブルのデータをselectする
-    try (
-      Connection c = DriverManager.getConnection(input.getJdbcURL(), input.getUserName(), input.getPassword());
-      PreparedStatement st = c.prepareStatement("SELECT id, name FROM people");
-    ) {
       logger.log("select people table", LogLevel.INFO);
       ResultSet rs = st.executeQuery();
       while (rs.next()) {
