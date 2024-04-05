@@ -1,4 +1,4 @@
 CREATE TABLE people (
-    id INTEGER NOT NULL ,
-    name VARCHAR(50) NOT NULL
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
 );
